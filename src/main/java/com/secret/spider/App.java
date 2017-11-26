@@ -19,10 +19,10 @@ public class App
     {
 //    	KafkaUtils.produceMessage("zol-bpl-request-topic", "8", "8");
     	
-    	Properties props = KafkaUtils.initConsumerProps("zol-bpl-group", "false", "1");
+    	Properties props = KafkaUtils.initConsumerProps("zol-product-param-request-group", "false", "1");
 		KafkaConsumer<String, String> consumer = new KafkaConsumer<String, String>(props);
 		//订阅主题列表topic
-		consumer.subscribe(Arrays.asList("zol-bpl-request-topic"));
+		consumer.subscribe(Arrays.asList("zol-product-param-request-topic"));
 		while (true) {
 			ConsumerRecords<String, String> records = consumer.poll(100);
 			for (ConsumerRecord<String, String> record : records) {

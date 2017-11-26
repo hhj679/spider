@@ -20,9 +20,11 @@ public class ZolBrandProductListSpider {
 		//****注意：要先创建topic：zol-bpl-request-topic
 //		spideBrandProductList();
 
-//		cleanProductList();
+		cleanProductList();
 		
-		checkProductList();
+//		checkProductList();
+		
+//		checkFirstLevelProductList();
 	}
 
 	public static void spideBrandProductList() throws IOException{
@@ -127,6 +129,39 @@ public class ZolBrandProductListSpider {
 		}
 	}
 	
+	public static void checkFirstLevelProductList() throws IOException {
+		List<String> brandList = FileUtils.readLines(new File("F:\\aliyun\\zol\\data\\jiadian-brands.txt"), "UTF-8");
+		for(String brand:brandList) {
+			try {
+				int jingIndex = brand.indexOf("#");
+				if(jingIndex == 0 || jingIndex == 1) {
+					continue;
+				}
+				String[] params = brand.split(",");
+				if(params.length < 2) {
+					logger.error("Split error brand product list error:" + brand);
+					continue;
+				}
+				String[] folders = params[1].split("/");
+				if(folders.length < 3) {
+					logger.error("Split url error brand product list error:" + brand);
+					continue;
+				}
+				
+				File categoryFile = new File("F:\\aliyun\\zol\\data\\product-list\\" +folders[1] + "\\" + folders[2]);
+				
+				if(!categoryFile.exists()) {
+					logger.error("Check Productlist, not found brand file error:" + folders[1] + "\\" + folders[2]);
+					KafkaUtils.produceMessage("zol-bpl-request-topic", 
+							"product-list" + URLConnUtils.folderSplit + folders[1] + URLConnUtils.folderSplit + folders[2] + URLConnUtils.folderSplit + "1.html", 
+							"http://detail.zol.com.cn" + params[1]);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public static void checkProductList() {
 		File pFile = new File("F:\\aliyun\\zol\\data\\product-list");
 		File[] cFiles = pFile.listFiles();
@@ -148,7 +183,7 @@ public class ZolBrandProductListSpider {
 							pageCount = Integer.valueOf(tpStrs[1].trim());
 						}
 						for(int i=2; i<= pageCount; i++) {
-							File moreFile = new File("F:\\aliyun\\zol\\data\\product-list\\" + cFile.getName() + "\\" + bFile.getName() + i + ".html");
+							File moreFile = new File("F:\\aliyun\\zol\\data\\product-list\\" + cFile.getName() + "\\" + bFile.getName() + "\\" + i + ".html");
 							if(!moreFile.exists()) {
 								logger.error("Check Productlist, not found more file error:" + cFile.getName() + "\\" + bFile.getName() + "\\" + i + ".html");
 								KafkaUtils.produceMessage("zol-bpl-request-topic", 

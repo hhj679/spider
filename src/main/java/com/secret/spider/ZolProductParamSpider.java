@@ -19,7 +19,7 @@ public class ZolProductParamSpider {
 	}
 	
 	public static void spideProductReviewHome() {
-		File pFile = new File("F:\\aliyun\\zol\\data\\products");
+		File pFile = new File("F:\\aliyun\\zol\\data\\product-list");
 		File[] cFiles = pFile.listFiles();
 		for(File cFile: cFiles) {
 			File[] bFiles = cFile.listFiles();
@@ -43,6 +43,7 @@ public class ZolProductParamSpider {
 									KafkaUtils.produceMessage("zol-product-param-request-topic", 
 											"param" + URLConnUtils.folderSplit + cFile.getName() + URLConnUtils.folderSplit + bFile.getName() + URLConnUtils.folderSplit + codes[1] + ".html", 
 											"http://detail.zol.com.cn/" + codes[0] + "/" + codes[1] + "/param.shtml");
+									Thread.sleep(500);
 								} else {
 									logger.error("Get codes fail at:" + cFile.getName() + "/" + bFile.getName());
 								}
